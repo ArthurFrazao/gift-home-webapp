@@ -1,0 +1,22 @@
+[
+    {
+        "product": {
+            "id": "0d1e1139-6262-4b3c-9dc4-701200b027f3",
+            "name": "Porta Condimentos Giratório - Aço Inox",
+            "imageUrl": "<presigned_url>",
+            "links": [],
+            "isAvailable": true
+        }
+    },
+    {
+        "product": {
+            "id": "68ce3f3f-978c-4894-8843-3ba04cecd266",
+            "name": "Conjunto 4 Pratos para Sobremesa 20cm - Marca Wolff",
+            "imageUrl": "<presigned_url>",
+            "links": [
+                "https://a.co/d/4tVxIPp"
+            ],
+            "isAvailable": true
+        }
+    }
+]
