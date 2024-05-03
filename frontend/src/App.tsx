@@ -1,43 +1,109 @@
+import { useCallback, useEffect, useState } from "react";
+
 import {
   Box,
   Button,
   Card,
   Divider,
-  HStack,
+  Flex,
   Heading,
   Image,
   Input,
+  Show,
   SimpleGrid,
+  Spinner,
   Stack,
   Text,
   VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-const glassMorphic = {
-  background: "rgba( 255, 193, 213, 0.25 )",
-  boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-  backdropFilter: "blur( 7px )",
-  "-webkit-backdrop-filter": "blur( 4px )",
-  borderRadius: "10px",
-  border: "1px solid rgba( 255, 255, 255, 0.18 )",
-};
+import { ModalProduct } from "./components/ModalProduct";
+import { useGift } from "./context/GiftContext";
+import api from "./services/api";
+import { CardFilterStyle } from "./styles/CardFilter";
+import { ProductResponse } from "./types/product";
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [valueFiltered, setValueFilterd] = useState("");
+  const [gifts, setGifts] = useState<ProductResponse[]>([]);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { setGiftSelected } = useGift();
+
+  const getGifts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get("/get_items");
+      const allGifts = response.data;
+
+      setGifts(allGifts);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputedValue = event.target.value.toLowerCase();
+    setValueFilterd(inputedValue);
+  };
+
+  const filteredGifts = gifts.filter((gift) =>
+    gift.product.name.toLowerCase().includes(valueFiltered)
+  );
+
+  const handleSelectGift = async (gift: { name: string; imageUrl: string }) => {
+    setGiftSelected({
+      name: gift.name,
+      imageUrl: gift.imageUrl,
+    });
+
+    onOpen();
+  };
+
+  useEffect(() => {
+    getGifts();
+  }, [getGifts]);
+
+  if (isLoading) {
+    return (
+      <Flex height="20rem" width="100%">
+        <Spinner
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="#fa9fb1"
+          size="xl"
+          margin="auto"
+        />
+      </Flex>
+    );
+  }
+
   return (
-    <Stack px={20}>
+    <Stack margin={"0 auto"} maxW="1440px" p="1rem">
+      <ModalProduct isOpen={isOpen} onClose={onClose} />
+
       <Box
         display="flex"
         flexDirection="row"
         justifyContent="space-between"
+        gap="1rem"
         py={12}
       >
         <VStack display="flex" flexDirection="row" alignItems="flex-end">
-          <Image
-            width="3.5rem"
-            height="3.5rem"
-            src="https://img.icons8.com/color/96/wedding-gift.png"
-            alt="wedding-gift"
-          />
+          <Show above="md">
+            <Image
+              width="3.5rem"
+              height="3.5rem"
+              src="https://img.icons8.com/color/96/wedding-gift.png"
+              loading="lazy"
+              alt="wedding-gift"
+            />
+          </Show>
           <Text
             fontSize="2.5rem"
             color="#252527"
@@ -47,9 +113,11 @@ export default function App() {
             Mavi's Sweet Home
           </Text>
         </VStack>
-        <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
-          Login
-        </Button>
+        <Show above="md">
+          <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
+            Login
+          </Button>
+        </Show>
       </Box>
 
       <Box>
@@ -57,164 +125,94 @@ export default function App() {
           <Heading>Lista de presentes</Heading>
           <Divider my="2rem" borderColor="#fa9fb1" />
           <Text>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Id facere
-            incidunt, tempora qui maiores quaerat, tenetur eaque impedit
-            distinctio enim atque repudiandae in magnam quidem voluptatibus quia
-            repellendus quas fuga!
+            Sonhar é bom, mas realizar sonhos com amigos queridos ao lado é bem
+            melhor. <br />
+            Se você está aqui, é porque eu desejo que você faça parte desse novo
+            capítulo que estou escrevendo para a minha história. Por esse
+            motivo, preparamos esse espaço com muito carinho para que você se
+            sinta confortável ao escolher como presentear minha nova casinha,
+            também estarei aberta a sugestões. Grande abraço!
           </Text>
         </VStack>
 
-        <Card
-          variant="elevated"
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
-          p="1rem"
-          mt="2rem"
-          {...glassMorphic}
-        >
-          <HStack>
-            <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
-              Todos
-            </Button>
-            <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
+        <Card {...CardFilterStyle}>
+          <Input
+            value={valueFiltered}
+            placeholder="Pesquisar presente pelo nome"
+            bg="#fff"
+            borderColor="#fa9fb1"
+            _hover={{ borderColor: "#fc6998" }}
+            _focusVisible={{ borderColor: "#f74780" }}
+            onChange={handleInputChange}
+          />
+          <Flex justifyContent="space-between" gap="1rem" width="100%">
+            <Button
+              bg="#fc6998"
+              color="#f9f9f9"
+              fontSize=".875rem"
+              _hover={{ bg: "#f74780" }}
+            >
               Itens não presenteados
             </Button>
-          </HStack>
-
-          <HStack>
-            <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
+            <Button
+              bg="#fc6998"
+              color="#f9f9f9"
+              fontSize=".875rem"
+              _hover={{ bg: "#f74780" }}
+            >
               Adicionar sugestão
             </Button>
-            <Input
-              placeholder="Pesquisar presente pelo nome"
-              width="20rem"
-              bg="#fff"
-              borderColor="#fa9fb1"
-              _hover={{ borderColor: "#fc6998" }}
-              _focusVisible={{ borderColor: "#f74780" }}
-            />
-          </HStack>
+          </Flex>
         </Card>
 
-        <SimpleGrid minChildWidth="250px" spacing={6} mt="2rem">
-          <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="1rem"
-          >
-            <Image
-              src="https://m.media-amazon.com/images/I/61en3E5zx9L._AC_SL1250_.jpg"
-              maxWidth="14rem"
-            />
-            <Text
-              as="h4"
-              mb="0.5rem"
-              fontSize="1.25rem"
-              textAlign="start"
-              width="100%"
-            >
-              Kit 15 Utensílios De Cozinha Com Cabo De Inox e Silicone Premium
-              (Creme)
-            </Text>
-            <Button
-              width="100%"
-              bg="#fc6998"
-              color="#f9f9f9"
-              _hover={{ bg: "#f74780" }}
-            >
-              Presentear
-            </Button>
-          </Card>
-          <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="1rem"
-          >
-            <Image
-              src="https://m.media-amazon.com/images/I/61en3E5zx9L._AC_SL1250_.jpg"
-              maxWidth="14rem"
-            />
-            <Text
-              as="h4"
-              mb="0.5rem"
-              fontSize="1.25rem"
-              textAlign="start"
-              width="100%"
-            >
-              Kit 15 Utensílios De Cozinha Com Cabo De Inox e Silicone Premium
-              (Creme)
-            </Text>
-            <Button
-              width="100%"
-              bg="#fc6998"
-              color="#f9f9f9"
-              _hover={{ bg: "#f74780" }}
-            >
-              Presentear
-            </Button>
-          </Card>
-          <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="1rem"
-          >
-            <Image
-              src="https://m.media-amazon.com/images/I/61en3E5zx9L._AC_SL1250_.jpg"
-              maxWidth="14rem"
-            />
-            <Text
-              as="h4"
-              mb="0.5rem"
-              fontSize="1.25rem"
-              textAlign="start"
-              width="100%"
-            >
-              Kit 15 Utensílios De Cozinha Com Cabo De Inox e Silicone Premium
-              (Creme)
-            </Text>
-            <Button
-              width="100%"
-              bg="#fc6998"
-              color="#f9f9f9"
-              _hover={{ bg: "#f74780" }}
-            >
-              Presentear
-            </Button>
-          </Card>
-          <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="1rem"
-          >
-            <Image
-              src="https://m.media-amazon.com/images/I/61en3E5zx9L._AC_SL1250_.jpg"
-              maxWidth="14rem"
-            />
-            <Text
-              as="h4"
-              mb="0.5rem"
-              fontSize="1.25rem"
-              textAlign="start"
-              width="100%"
-            >
-              Kit 15 Utensílios De Cozinha Com Cabo De Inox e Silicone Premium
-              (Creme)
-            </Text>
-            <Button
-              width="100%"
-              bg="#fc6998"
-              color="#f9f9f9"
-              _hover={{ bg: "#f74780" }}
-            >
-              Presentear
-            </Button>
-          </Card>
+        <SimpleGrid
+          minChildWidth="15.625rem"
+          justifyItems="center"
+          spacing={6}
+          mt="2rem"
+        >
+          {filteredGifts.map((gift: ProductResponse, index: number) => {
+            return (
+              <Card
+                key={index}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                p="1rem"
+                maxW="18.75rem"
+              >
+                {gift.product.imageUrl && (
+                  <Image
+                    width="13.75rem"
+                    height="11.25rem"
+                    objectFit="cover"
+                    src={gift.product.imageUrl}
+                  />
+                )}
+                <Text
+                  as="h4"
+                  mb="0.5rem"
+                  fontSize="1.25rem"
+                  textAlign="start"
+                  width="100%"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  {gift.product.name}
+                </Text>
+                <Button
+                  width="100%"
+                  bg="#fc6998"
+                  color="#f9f9f9"
+                  _hover={{ bg: "#f74780" }}
+                  onClick={() => handleSelectGift(gift.product)}
+                >
+                  Presentear
+                </Button>
+              </Card>
+            );
+          })}
         </SimpleGrid>
       </Box>
     </Stack>
