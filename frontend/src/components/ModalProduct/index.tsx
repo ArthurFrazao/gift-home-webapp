@@ -9,6 +9,9 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Link,
+  List,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,6 +23,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useGift } from "../../context/GiftContext";
 import { HouseholdApplianceInformation } from "../HouseholdApplianceInformation";
 
@@ -32,6 +36,8 @@ export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
   const { giftSelected } = useGift();
 
   const [showExtraInformation, setShowExtraInformation] = useState(true);
+
+  const { links } = giftSelected;
 
   return (
     <>
@@ -67,6 +73,36 @@ export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
                     _focusVisible={{ borderColor: "#f74780" }}
                   />
                 </FormControl>
+
+                {links.length > 0 && (
+                  <Flex
+                    flexDirection="column"
+                    justifyContent="flex-start"
+                    width="100%"
+                    mt="1rem"
+                  >
+                    <Text as="span" fontSize="0.875rem">
+                      Deixei aqui sugestões de lugares que você pode encontrar
+                      esse item.
+                    </Text>
+                    <List mt="0.875rem">
+                      {links.map((link: string, index: number) => {
+                        return (
+                          <ListItem key={index}>
+                            <Link
+                              href={link}
+                              isExternal
+                              _hover={{ color: "#fc6998" }}
+                            >
+                              Opção de link {index + 1}{" "}
+                              <ExternalLinkIcon mx="2px" />
+                            </Link>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Flex>
+                )}
               </VStack>
             )}
           </ModalBody>

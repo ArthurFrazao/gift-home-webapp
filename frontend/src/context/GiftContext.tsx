@@ -7,9 +7,10 @@ import React, {
   useState,
 } from "react";
 
-type Gift = {
+export type Gift = {
   imageUrl: string;
   name: string;
+  links: string[];
 };
 
 type GiftContextData = {
@@ -27,6 +28,7 @@ export function GiftProvider({ children }: GiftProviderProps) {
   const [giftSelected, setGiftSelected] = useState({
     name: "",
     imageUrl: "",
+    links: [""],
   });
 
   return (

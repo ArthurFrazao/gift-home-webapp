@@ -18,11 +18,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { CardProduct } from "./components/CardProduct";
 import { ModalProduct } from "./components/ModalProduct";
-import { useGift } from "./context/GiftContext";
+
+import { Gift, useGift } from "./context/GiftContext";
 import api from "./services/api";
-import { CardFilterStyle } from "./styles/CardFilter";
 import { ProductResponse } from "./types/product";
+
+import { CardFilterStyle } from "./styles/CardFilter";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +58,11 @@ export default function App() {
     gift.product.name.toLowerCase().includes(valueFiltered)
   );
 
-  const handleSelectGift = async (gift: { name: string; imageUrl: string }) => {
+  const handleSelectGift = async (gift: Gift) => {
     setGiftSelected({
       name: gift.name,
       imageUrl: gift.imageUrl,
+      links: gift.links,
     });
 
     onOpen();
@@ -173,44 +177,11 @@ export default function App() {
         >
           {filteredGifts.map((gift: ProductResponse, index: number) => {
             return (
-              <Card
+              <CardProduct
                 key={index}
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                p="1rem"
-                maxW="18.75rem"
-              >
-                {gift.product.imageUrl && (
-                  <Image
-                    width="13.75rem"
-                    height="11.25rem"
-                    objectFit="cover"
-                    src={gift.product.imageUrl}
-                  />
-                )}
-                <Text
-                  as="h4"
-                  mb="0.5rem"
-                  fontSize="1.25rem"
-                  textAlign="start"
-                  width="100%"
-                  whiteSpace="nowrap"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                >
-                  {gift.product.name}
-                </Text>
-                <Button
-                  width="100%"
-                  bg="#fc6998"
-                  color="#f9f9f9"
-                  _hover={{ bg: "#f74780" }}
-                  onClick={() => handleSelectGift(gift.product)}
-                >
-                  Presentear
-                </Button>
-              </Card>
+                gift={gift}
+                onConfirm={() => handleSelectGift(gift.product)}
+              />
             );
           })}
         </SimpleGrid>
