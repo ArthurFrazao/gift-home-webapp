@@ -48,7 +48,7 @@ def get_items(event, context):
     response = {
         "statusCode": 200,
         "body": json.dumps(products),
-        "headers": {"Content-Type": "application/json"}
+        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
 
     return response
@@ -69,7 +69,7 @@ def confirm_gift(event, context):
     response = {
         "statusCode": 200,
         "body": json.dumps({"message": "Gift confirmed successfully"}),
-        "headers": {"Content-Type": "application/json"}
+        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
     logger.info("Gift confirmed successfully")
 

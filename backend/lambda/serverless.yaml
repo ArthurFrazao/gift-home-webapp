@@ -19,6 +19,10 @@ functions:
       - httpApi:
           method: GET
           path: /get_items
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
 
   confirm_gift:
     handler: handler.confirm_gift
@@ -26,3 +30,7 @@ functions:
       - httpApi:
           method: POST
           path: /posts/confirm_gift
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
