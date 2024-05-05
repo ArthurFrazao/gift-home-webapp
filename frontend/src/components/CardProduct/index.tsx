@@ -16,13 +16,15 @@ interface CardProductProps {
 }
 
 export function CardProduct({ gift, onConfirm }: CardProductProps) {
+  const { isAvailable } = gift.product;
+
   return (
     <Card
       display="flex"
       flexDirection="column"
       alignItems="center"
       p="1rem"
-      maxW="18.75rem"
+      w="100%"
     >
       <CardHeader>
         {gift.product.imageUrl && (
@@ -48,6 +50,7 @@ export function CardProduct({ gift, onConfirm }: CardProductProps) {
           color="#f9f9f9"
           _hover={{ bg: "#f74780" }}
           onClick={onConfirm}
+          isDisabled={!isAvailable}
         >
           Presentear
         </Button>

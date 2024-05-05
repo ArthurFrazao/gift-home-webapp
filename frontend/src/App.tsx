@@ -6,6 +6,7 @@ import {
   Card,
   Divider,
   Flex,
+  HStack,
   Heading,
   Image,
   Input,
@@ -25,6 +26,8 @@ import { Gift, useGift } from "./context/GiftContext";
 import api from "./services/api";
 import { ProductResponse } from "./types/product";
 
+import { ModalLogin } from "./components/ModalLogin";
+import { useAuth } from "./context/AuthContext";
 import { CardFilterStyle } from "./styles/CardFilter";
 
 export default function App() {
@@ -32,8 +35,9 @@ export default function App() {
   const [valueFiltered, setValueFilterd] = useState("");
   const [gifts, setGifts] = useState<ProductResponse[]>([]);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isLoggedIn } = useAuth();
   const { setGiftSelected } = useGift();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const getGifts = useCallback(async () => {
     setIsLoading(true);
@@ -57,6 +61,11 @@ export default function App() {
   const filteredGifts = gifts.filter((gift) =>
     gift.product.name.toLowerCase().includes(valueFiltered)
   );
+
+  const handleFilterGifts = () => {
+    const filteredGifts = gifts.filter((gift) => gift.product.isAvailable);
+    setGifts(filteredGifts);
+  };
 
   const handleSelectGift = async (gift: Gift) => {
     setGiftSelected({
@@ -119,9 +128,7 @@ export default function App() {
           </Text>
         </VStack>
         <Show above="md">
-          <Button bg="#fc6998" color="#f9f9f9" _hover={{ bg: "#f74780" }}>
-            Login
-          </Button>
+          <ModalLogin />
         </Show>
       </Box>
 
@@ -151,22 +158,36 @@ export default function App() {
             onChange={handleInputChange}
           />
           <Flex justifyContent="space-between" gap="1rem" width="100%">
-            <Button
-              bg="#fc6998"
-              color="#f9f9f9"
-              fontSize=".875rem"
-              _hover={{ bg: "#f74780" }}
-            >
-              Itens não presenteados
-            </Button>
-            <Button
-              bg="#fc6998"
-              color="#f9f9f9"
-              fontSize=".875rem"
-              _hover={{ bg: "#f74780" }}
-            >
-              Adicionar sugestão
-            </Button>
+            <HStack>
+              <Button
+                bg="#fc6998"
+                color="#f9f9f9"
+                fontSize=".875rem"
+                _hover={{ bg: "#f74780" }}
+                onClick={() => getGifts()}
+              >
+                Exibir todos
+              </Button>
+              <Button
+                bg="#fc6998"
+                color="#f9f9f9"
+                fontSize=".875rem"
+                _hover={{ bg: "#f74780" }}
+                onClick={handleFilterGifts}
+              >
+                Itens não presenteados
+              </Button>
+            </HStack>
+            {isLoggedIn && (
+              <Button
+                bg="#fc6998"
+                color="#f9f9f9"
+                fontSize=".875rem"
+                _hover={{ bg: "#f74780" }}
+              >
+                Adicionar sugestão
+              </Button>
+            )}
           </Flex>
         </Card>
 
