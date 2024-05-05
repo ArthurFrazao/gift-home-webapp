@@ -21,6 +21,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  UseToastOptions,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -34,6 +35,23 @@ interface ModalProductProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const toastSuccess: UseToastOptions = {
+  isClosable: true,
+  duration: 2000,
+  position: "top",
+  status: "success",
+  title: "Boa escolha! Muito obrigado pelo presente ❤️",
+  onCloseComplete: () => location.reload(),
+};
+
+const toastError: UseToastOptions = {
+  isClosable: true,
+  duration: 2000,
+  position: "top",
+  status: "error",
+  title: "Ops! Algo deu errado",
+};
 
 export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
   const toast = useToast();
@@ -52,30 +70,17 @@ export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
 
   const updateGift = async () => {
     setIsLoading(true);
+
     try {
       await api.post("/posts/confirm_gift", {
         id: giftSelected.id,
         namePerson: inputValue,
       });
-
-      toast({
-        duration: 3000,
-        position: "top",
-        status: "success",
-        title: "Boa escolha! Muito obrigado pelo presente ❤️",
-      });
+      toast(toastSuccess);
     } catch (error) {
-      console.error(error);
-    } finally {
+      toast(toastError);
       setIsLoading(false);
-
-      toast({
-        isClosable: true,
-        duration: 3000,
-        position: "top",
-        status: "error",
-        title: "Ops! Algo deu errado",
-      });
+      console.error(error);
     }
   };
 
