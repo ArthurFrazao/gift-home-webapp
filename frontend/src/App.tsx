@@ -60,6 +60,7 @@ export default function App() {
 
   const handleSelectGift = async (gift: Gift) => {
     setGiftSelected({
+      id: gift.id,
       name: gift.name,
       imageUrl: gift.imageUrl,
       links: gift.links,

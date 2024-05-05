@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -21,11 +22,13 @@ import {
   ModalOverlay,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { useGift } from "../../context/GiftContext";
 import { HouseholdApplianceInformation } from "../HouseholdApplianceInformation";
+
+import { useGift } from "../../context/GiftContext";
+import api from "../../services/api";
 
 interface ModalProductProps {
   isOpen: boolean;
@@ -33,11 +36,48 @@ interface ModalProductProps {
 }
 
 export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
+  const toast = useToast();
   const { giftSelected } = useGift();
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [showExtraInformation, setShowExtraInformation] = useState(true);
 
   const { links } = giftSelected;
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputedValue = event.target.value;
+    setInputValue(inputedValue);
+  };
+
+  const updateGift = async () => {
+    setIsLoading(true);
+    try {
+      await api.post("/posts/confirm_gift", {
+        id: giftSelected.id,
+        namePerson: inputValue,
+      });
+
+      toast({
+        duration: 3000,
+        position: "top",
+        status: "success",
+        title: "Boa escolha! Muito obrigado pelo presente ❤️",
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+
+      toast({
+        isClosable: true,
+        duration: 3000,
+        position: "top",
+        status: "error",
+        title: "Ops! Algo deu errado",
+      });
+    }
+  };
 
   return (
     <>
@@ -71,6 +111,8 @@ export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
                     borderColor="#fa9fb1"
                     _hover={{ borderColor: "#fc6998" }}
                     _focusVisible={{ borderColor: "#f74780" }}
+                    value={inputValue}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
 
@@ -125,6 +167,8 @@ export function ModalProduct({ isOpen, onClose }: ModalProductProps) {
                   bg="#fc6998"
                   color="#f9f9f9"
                   _hover={{ bg: "#f74780" }}
+                  isLoading={isLoading}
+                  onClick={updateGift}
                 >
                   Confirmar
                 </Button>
