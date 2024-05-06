@@ -151,7 +151,7 @@ export function ModalSuggestion() {
                 my="1rem"
                 isLoading={isLoading}
               >
-                Entrar
+                Salvar
               </Button>
             </Flex>
           </ModalBody>
