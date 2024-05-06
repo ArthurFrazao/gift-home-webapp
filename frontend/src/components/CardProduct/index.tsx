@@ -4,9 +4,10 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  Image,
   Text,
 } from "@chakra-ui/react";
+
+import { ModalImage } from "../ModalImage";
 
 import { ProductResponse } from "../../types/product";
 
@@ -27,14 +28,7 @@ export function CardProduct({ gift, onConfirm }: CardProductProps) {
       w="100%"
     >
       <CardHeader>
-        {gift.product.imageUrl && (
-          <Image
-            width="13.75rem"
-            height="11.25rem"
-            objectFit="cover"
-            src={gift.product.imageUrl}
-          />
-        )}
+        {gift.product.imageUrl && <ModalImage gift={gift} />}
       </CardHeader>
 
       <CardBody>

@@ -26,7 +26,9 @@ import { Gift, useGift } from "./context/GiftContext";
 import api from "./services/api";
 import { ProductResponse } from "./types/product";
 
+import { ContentFooter } from "./components/ContentFooter";
 import { ModalLogin } from "./components/ModalLogin";
+import { ModalSuggestion } from "./components/ModalSuggestion";
 import { useAuth } from "./context/AuthContext";
 import { CardFilterStyle } from "./styles/CardFilter";
 
@@ -178,16 +180,7 @@ export default function App() {
                 Itens não presenteados
               </Button>
             </HStack>
-            {isLoggedIn && (
-              <Button
-                bg="#fc6998"
-                color="#f9f9f9"
-                fontSize=".875rem"
-                _hover={{ bg: "#f74780" }}
-              >
-                Adicionar sugestão
-              </Button>
-            )}
+            {isLoggedIn && <ModalSuggestion />}
           </Flex>
         </Card>
 
@@ -208,6 +201,8 @@ export default function App() {
           })}
         </SimpleGrid>
       </Box>
+
+      <ContentFooter />
     </Stack>
   );
 }
