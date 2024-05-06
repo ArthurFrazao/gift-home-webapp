@@ -47,8 +47,7 @@ def get_items(event, context):
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(products),
-        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
+        "body": json.dumps(products)
     }
 
     return response
@@ -63,13 +62,13 @@ def confirm_gift(event, context):
 
     item = table.get_item(Key={"id": id}).get("Item")
     item["isAvailable"] = False
+    item["namePerson"] = name_person
     table.put_item(Item=item)
     logger.info("Gift status updated")
 
     response = {
         "statusCode": 200,
-        "body": json.dumps({"message": "Gift confirmed successfully"}),
-        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
+        "body": json.dumps({"message": "Gift confirmed successfully"})
     }
     logger.info("Gift confirmed successfully")
 

@@ -3,6 +3,15 @@ service: ms-gift-home-webapp
 frameworkVersion: '3'
 
 provider:
+  httpApi:
+      cors:
+        allowedOrigins:
+          - https://gift-home-webapp.vercel.app
+        allowedHeaders:
+          - Content-Type
+        allowedMethods:
+          - GET
+          - POST
   name: aws
   runtime: python3.9
   memorySize: 512
@@ -19,10 +28,6 @@ functions:
       - httpApi:
           method: GET
           path: /get_items
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
 
   confirm_gift:
     handler: handler.confirm_gift
@@ -30,7 +35,3 @@ functions:
       - httpApi:
           method: POST
           path: /posts/confirm_gift
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
