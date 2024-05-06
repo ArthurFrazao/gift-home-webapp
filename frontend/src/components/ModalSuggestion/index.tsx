@@ -1,3 +1,5 @@
+import { ChangeEvent, FormEvent, useState } from "react";
+
 import {
   Button,
   Flex,
@@ -11,19 +13,42 @@ import {
   ModalHeader,
   ModalOverlay,
   Show,
+  UseToastOptions,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { InputStyle } from "../../styles/Input";
+
+import api from "../../services/api";
+
+const toastSuccess: UseToastOptions = {
+  isClosable: true,
+  duration: 2000,
+  position: "top",
+  status: "success",
+  title: "Novo presente adicionado",
+  onCloseComplete: () => location.reload(),
+};
+
+const toastError: UseToastOptions = {
+  isClosable: true,
+  duration: 2000,
+  position: "top",
+  status: "error",
+  title: "Ops! Algo deu errado",
+};
 
 const INITIAL_FORM_VALUES = {
   name: "",
   link: "",
-  image: undefined,
+  image_link: "",
 };
 
 export function ModalSuggestion() {
+  const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [fieldValues, setFieldValues] = useState(INITIAL_FORM_VALUES);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -35,8 +60,25 @@ export function ModalSuggestion() {
     });
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const createNewGift = async (event: FormEvent) => {
     event?.preventDefault();
+    setIsLoading(true);
+
+    const { image_link, link, name } = fieldValues;
+
+    try {
+      await api.post("/posts/add_gift", {
+        name,
+        link,
+        image_link,
+      });
+
+      toast(toastSuccess);
+    } catch (error) {
+      toast(toastError);
+      setIsLoading(false);
+      console.error(error);
+    }
   };
 
   return (
@@ -64,16 +106,13 @@ export function ModalSuggestion() {
               direction="column"
               gap="1rem"
               justifyContent="flex-start"
-              onSubmit={handleSubmit}
+              onSubmit={createNewGift}
             >
               <FormControl>
                 <FormLabel>Nome do item</FormLabel>
                 <Input
+                  {...InputStyle}
                   placeholder="Cafeteira Espresso"
-                  bg="#fff"
-                  borderColor="#fa9fb1"
-                  _hover={{ borderColor: "#fc6998" }}
-                  _focusVisible={{ borderColor: "#f74780" }}
                   name="name"
                   value={fieldValues.name}
                   onChange={handleInputChange}
@@ -83,11 +122,8 @@ export function ModalSuggestion() {
               <FormControl>
                 <FormLabel>Link</FormLabel>
                 <Input
+                  {...InputStyle}
                   placeholder="http://"
-                  bg="#fff"
-                  borderColor="#fa9fb1"
-                  _hover={{ borderColor: "#fc6998" }}
-                  _focusVisible={{ borderColor: "#f74780" }}
                   name="link"
                   type="url"
                   value={fieldValues.link}
@@ -98,13 +134,11 @@ export function ModalSuggestion() {
               <FormControl>
                 <FormLabel>Imagem do item</FormLabel>
                 <Input
+                  {...InputStyle}
                   placeholder="http://"
-                  bg="#fff"
-                  borderColor="#fa9fb1"
-                  _hover={{ borderColor: "#fc6998" }}
-                  _focusVisible={{ borderColor: "#f74780" }}
-                  name="image"
-                  value={fieldValues.image}
+                  type="url"
+                  name="image_link"
+                  value={fieldValues.image_link}
                   onChange={handleInputChange}
                 />
               </FormControl>
@@ -115,6 +149,7 @@ export function ModalSuggestion() {
                 _hover={{ bg: "#f74780" }}
                 type="submit"
                 my="1rem"
+                isLoading={isLoading}
               >
                 Entrar
               </Button>
